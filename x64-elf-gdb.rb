@@ -13,7 +13,7 @@ class UniversalBrewedPython < Requirement
   end
 end
 
-class Gdb < Formula
+class X64ElfGdb < Formula
   homepage "http://www.gnu.org/software/gdb/"
   url "http://ftpmirror.gnu.org/gdb/gdb-7.7.1.tar.gz"
   mirror "http://ftp.gnu.org/gnu/gdb/gdb-7.7.1.tar.gz"

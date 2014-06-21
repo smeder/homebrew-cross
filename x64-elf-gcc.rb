@@ -1,6 +1,6 @@
 require "formula"
 
-class Gcc < Formula
+class X64ElfGcc < Formula
   homepage "http://gcc.gnu.org"
   url "http://ftpmirror.gnu.org/gcc/gcc-4.8.3/gcc-4.8.3.tar.bz2"
   mirror "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.3/gcc-4.8.3.tar.bz2"
