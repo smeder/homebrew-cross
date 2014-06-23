@@ -5,6 +5,7 @@ class X64ElfBinutils < Formula
   url 'http://ftpmirror.gnu.org/binutils/binutils-2.24.tar.gz'
   mirror 'http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz'
   sha1 '1b2bc33003f4997d38fadaa276c1f0321329ec56'
+  revision 1
 
   def install
     system "./configure", "--disable-debug",
