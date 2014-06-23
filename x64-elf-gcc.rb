@@ -1,26 +1,6 @@
 require "formula"
 
 class X64ElfGcc < Formula
-  def arch
-    if Hardware::CPU.type == :intel
-      if MacOS.prefer_64_bit?
-        'x86_64'
-      else
-        'i686'
-      end
-    elsif Hardware::CPU.type == :ppc
-      if MacOS.prefer_64_bit?
-        'ppc64'
-      else
-        'ppc'
-      end
-    end
-  end
-
-  def osmajor
-    `uname -r`.chomp
-  end
-
   homepage "http://gcc.gnu.org"
   url "http://ftpmirror.gnu.org/gcc/gcc-4.8.3/gcc-4.8.3.tar.bz2"
   mirror "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.3/gcc-4.8.3.tar.bz2"
@@ -30,7 +10,6 @@ class X64ElfGcc < Formula
   head "svn://gcc.gnu.org/svn/gcc/branches/gcc-4_8-branch"
 
   option "with-nls", "Build with native language support (localization)"
-  option "with-profiled-build", "Make use of profile guided optimization when bootstrapping GCC"
   # enabling multilib on a host that can't run 64-bit results in build failures
   option "without-multilib", "Build without multilib support" if MacOS.prefer_64_bit?
 
@@ -39,7 +18,7 @@ class X64ElfGcc < Formula
   depends_on "mpfr"
   depends_on "cloog"
   depends_on "isl"
-  depends_on "binutils"
+  depends_on "x64-elf-binutils"
 
   fails_with :gcc_4_0
 
@@ -50,13 +29,12 @@ class X64ElfGcc < Formula
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
 
-    # C, C++, ObjC compilers are always built
-    languages = %w[c c++ objc obj-c++]
+    # C, C++ compilers are always built
+    languages = %w[c c++]
 
     version_suffix = version.to_s.slice(/\d\.\d/)
 
     args = [
-      "--build=#{arch}-apple-darwin#{osmajor}",
       "--prefix=#{prefix}",
       "--target=x86_64-elf",
       "--enable-languages=#{languages.join(",")}",
@@ -114,13 +92,17 @@ class X64ElfGcc < Formula
         # optimise all the way to 11.
         system "make", "profiledbootstrap"
       else
-        system "make", "bootstrap"
+        system "make"
       end
 
       # At this point `make check` could be invoked to run the testsuite. The
       # deja-gnu and autogen formulae must be installed in order to do this.
 
       system "make", "install"
+
+      if build.with?("fortran") || build.with?("all-languages")
+        bin.install_symlink bin/"gfortran-#{version_suffix}" => "gfortran"
+      end
     end
 
     # Handle conflicts between GCC formulae and avoid interfering
@@ -134,6 +116,18 @@ class X64ElfGcc < Formula
     # install-info is run. TODO fix this.
     info.rmtree
 
+    # Rename java properties
+    if build.with?("java") || build.with?("all-languages")
+      config_files = [
+        "#{lib}/logging.properties",
+        "#{lib}/security/classpath.security",
+        "#{lib}/i386/logging.properties",
+        "#{lib}/i386/security/classpath.security"
+      ]
+      config_files.each do |file|
+        add_suffix file, version_suffix if File.exist? file
+      end
+    end
   end
 
   def add_suffix file, suffix
