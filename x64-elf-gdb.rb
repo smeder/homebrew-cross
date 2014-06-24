@@ -20,8 +20,6 @@ class X64ElfGdb < Formula
   sha1 "bb49bdb5781ea62ccdc2ec6869872e1b43168572"
 
   depends_on "readline"
-  depends_on 'x64-elf-binutils'
-  depends_on 'x64-elf-gcc'
 
   if build.with? "brewed-python"
     depends_on UniversalBrewedPython
